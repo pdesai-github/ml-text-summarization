@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-app-tax-labels
+  namespace: easy-kart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ml-app-tax-labels #This should be same label
+  template:
+    metadata:
+      labels:
+        app: ml-app-tax-labels #This should be same label
+    spec:
+      containers:
+      - name: ml-app-tax-labels
+        image: pdesaidocker/ml-classification-tax-labels:{{imageTag}}
+        ports:
+        - containerPort: 5000 #port defined in image dockerfile
+       

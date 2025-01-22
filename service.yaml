@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-app-text-summarization
+  namespace: easy-kart
+spec:
+  selector:
+    app: ml-app-tax-labels #This should be same label
+  ports:
+    - protocol: TCP
+      port: 80 #Other pods in the cluster can connect to this service on port 80
+      targetPort: 5001 #port defined in image dockerfi
+  type: LoadBalancer
