@@ -11,7 +11,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port your app runs on
-EXPOSE 5001
+EXPOSE 5000
 
 # Run the Flask app
 CMD ["python", "summarization.py"]

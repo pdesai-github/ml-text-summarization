@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
 from transformers import pipeline
 
 # Initialize Flask app
@@ -47,4 +48,5 @@ def not_found(e):
     return jsonify({"status": "error", "message": "Endpoint not found"}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
