@@ -18,4 +18,42 @@ spec:
         image: pdesaidocker/ml-app-text-summarization
         ports:
         - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-app-text-summarization-service
+  namespace: ml-apps
+spec:
+  selector:
+    app: ml-app-text-summarization 
+  ports:
+    - protocol: TCP
+      port: 80 
+      targetPort: 5000 
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ml-app-text-summarization
+  namespace: ml-apps
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /review-summary
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    ingress.class: "nginx"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: easy-kart.pdtechhub.in
+      http:
+        paths:
+          - path: /reviews
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ml-app-text-summarization-service
+                port:
+                  number: 80
+---
        
