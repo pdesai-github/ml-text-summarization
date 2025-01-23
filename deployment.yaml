@@ -48,7 +48,7 @@ spec:
     - host: easy-kart.pdtechhub.in
       http:
         paths:
-          - path: /reviews
+          - path: /summary
             pathType: ImplementationSpecific
             backend:
               service:
