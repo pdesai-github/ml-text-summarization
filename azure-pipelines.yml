@@ -1,0 +1,53 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  dockerRegistryServiceConnection: 'docker-service-connection'
+  imageRepository: 'pdesaidocker/ml-app-text-summarization'
+  containerRegistry: 'pdesaidocker'
+  tag: '$(Build.BuildId)'
+  System.Debug: true
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+    - job: BuildAndPush
+      displayName: Build and Push Docker Image
+      steps:    
+      - task: Docker@2
+        displayName: Build and push Docker image
+        inputs:
+          command: 'buildAndPush'
+          repository: $(imageRepository)
+          dockerfile: 'EasyKart.Orders.StateMachine/Dockerfile'
+          buildContext: '.'
+          tags: $(tag)
+          containerRegistry: $(dockerRegistryServiceConnection)
+
+- stage: Deploy
+  displayName: Deploy to AKS
+  dependsOn: Build
+  jobs:
+  - job: DeployToAKS
+    displayName: Deploy to AKS
+    steps:
+    - script: |
+        echo "Replacing {{imageTag}} in deployment.yaml with $(tag)"
+        sed -i 's/{{imageTag}}/$(tag)/g' EasyKart.Orders.StateMachine/deployment.yaml
+      displayName: Replace tag in deployment.yaml
+    - task: Kubernetes@1
+      displayName: Apply deployment.yaml
+      inputs:
+        kubernetesServiceEndpoint: 'az-k8s-easy-kart'
+        namespace: 'easy-kart'
+        command: 'apply'
+        arguments: '-f deployment.yaml'
